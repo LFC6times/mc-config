@@ -1,3 +1,7 @@
+package ml.ikwid.nmtq.config;
+
+import ml.ikwid.nmtq.NMTQ;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -15,16 +19,25 @@ public class Config {
 		try {
 			input = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
+			NMTQ.LOGGER.info("File not found");
+
 			try {
 				File config = new File(fileName);
-				config.createNewFile(); // "Result of 'File.createNewFile()' is ignored" - IntelliJ, 2022
+				if(!config.getParentFile().exists()) {
+					config.getParentFile().mkdirs();
+				}
+				config.createNewFile();
+
+				File file = new File(config.getAbsolutePath());
 				FileWriter writer = new FileWriter(config);
 				writer.write(defaultConfig);
 
 				writer.close();
-
 				input = new Scanner(new File(fileName));
+
+
 			} catch(IOException er) {
+				NMTQ.LOGGER.info(er);
 			}
 		} finally {
 			String lines = this.getLines();
@@ -61,6 +74,7 @@ public class Config {
 		while (input.hasNextLine()) {
 			String line = input.nextLine();
 			if(line == null || Objects.equals(line, "") || line.length() == 0 || line.charAt(0) == '#') continue;
+			NMTQ.LOGGER.info("line: " + line);
 			sb.append(line);
 			sb.append("=");
 		}
